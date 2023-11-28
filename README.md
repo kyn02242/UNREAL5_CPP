@@ -3,6 +3,7 @@
 C++을 이용한 게임개발  
 
 [강의 사이트 링크][1]
+[내용 정리 블로그][2]
 
 1강. 개요  
 
@@ -32,3 +33,4 @@ C++을 이용한 게임개발
 16강. 게임의 완성  
 
 [1]: https://www.inflearn.com/course/이득우-언리얼-프로그래밍-part-2
+[2]: https://blog.naver.com/PostList.naver?blogId=greenhood1383&from=postList&categoryNo=6
