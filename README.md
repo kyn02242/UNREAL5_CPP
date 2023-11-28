@@ -2,7 +2,7 @@
 
 C++을 이용한 게임개발  
 
-https://www.inflearn.com/course/%EC%9D%B4%EB%93%9D%EC%9A%B0-%EC%96%B8%EB%A6%AC%EC%96%BC-%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D-part-2  
+[림크][1]
 
 1강. 개요  
 
@@ -30,3 +30,5 @@ https://www.inflearn.com/course/%EC%9D%B4%EB%93%9D%EC%9A%B0-%EC%96%B8%EB%A6%AC%E
 14강. 헤드업디스플레이의(HUD) 구현  
 15강. 게임 플로우 다듬기  
 16강. 게임의 완성  
+
+[1]: https://www.inflearn.com/course/이득우-언리얼-프로그래밍-part-2
