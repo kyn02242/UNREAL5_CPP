@@ -9,7 +9,7 @@
 AABGameMode::AABGameMode()
 {
 	//Default Pawn Class 설정
-	static ConstructorHelpers::FClassFinder<APawn> ThirdPersonClassRef(TEXT("/Game/ThirdPerson/Blueprints/BP_ThirdPersonCharacter.BP_ThirdPersonCharacter_C"));
+	//static ConstructorHelpers::FClassFinder<APawn> ThirdPersonClassRef(TEXT("/Game/ThirdPerson/Blueprints/BP_ThirdPersonCharacter.BP_ThirdPersonCharacter_C"));
 	//기본 제공되는 ThirdPersonBP의 Pawn의 에셋정보를 가져오는 과정
 	//끝의 _C는 클래스의 정보를 가져오기 위해서
 	// 

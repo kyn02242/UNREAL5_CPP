@@ -31,14 +31,16 @@ AABCharacterBase::AABCharacterBase()
     GetMesh()->SetCollisionProfileName(TEXT("CharacterMesh"));
 
     // 메쉬 불러오기(분수대와 마찬가지로 오브젝트로 불러온다)
-    static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Quinn_Simple.SKM_Quinn_Simple'"));
+    static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/InfinityBladeWarriors/Character/CompleteCharacters/SK_CharM_Cardboard.SK_CharM_Cardboard'"));
     if (CharacterMeshRef.Object)
     {
         GetMesh()->SetSkeletalMesh(CharacterMeshRef.Object);
     }
 
     // 애니메이션 불러오기(클래스로 불러와야함)
-    static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/Characters/Mannequins/Animations/ABP_Quinn.ABP_Quinn_C"));
+    //AnimBluprint 클래스 형으로 변환할것이 아니기 때문에 작은 따옴표x
+    //클래스 정보이므로 마지막에 _C 붙여줄것
+    static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceClassRef(TEXT("/Game/ArenaBattle/Animation/ABP_ABCharacter.ABP_ABCharacter_C"));
     if (AnimInstanceClassRef.Class)
     {
         GetMesh()->SetAnimInstanceClass(AnimInstanceClassRef.Class);
