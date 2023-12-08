@@ -3,6 +3,8 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "ABCharacterControlData.h"
+#include "Animation/AnimMontage.h"
+#include "ABComboActionData.h"
 
 // Sets default values
 AABCharacterBase::AABCharacterBase()
@@ -70,4 +72,94 @@ void AABCharacterBase::SetCharacterControlData(const UABCharacterControlData* Ch
     GetCharacterMovement()->bOrientRotationToMovement = CharacterControlData->bOrientRotationToMovement;
     GetCharacterMovement()->bUseControllerDesiredRotation = CharacterControlData->bUseControllerDesiredRotation;
     GetCharacterMovement()->RotationRate = CharacterControlData->RotationRate;
+}
+
+void AABCharacterBase::ProcessComboCommand()
+{
+    if (CurrentCombo == 0)
+    {
+        ComboActionBegin();
+        return;
+    }
+    //더 이상 진행할 필요가 없거나, 입력 타이밍을 놓친 경우
+    if (!ComboTimerHandle.IsValid())
+    {
+        HasNextComboCommand = false;
+    }
+    //타이머가 유효한 경우 : 입력이 제 타이밍에 들어온 경우
+    else
+    {
+        HasNextComboCommand = true;
+    }
+}
+
+void AABCharacterBase::ComboActionBegin()
+{
+    //콤보 상태
+    CurrentCombo = 1;
+
+    //Movement 지정
+    //Movement 없앤다
+    GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+
+    //애니메이션 지정
+    //애니메이션 속도 지정
+    const float AttackSpeedRate = 1.0f;
+    //몽타주 재생을 위해 AnimInstance의 포인터 가져오기
+    UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+    //몽타주 재생
+    AnimInstance->Montage_Play(ComboActionMontage, AttackSpeedRate);
+
+    //몽타주 재생이 끝날때, ComboActionEnd 실행
+    FOnMontageEnded EndDelegate;
+    EndDelegate.BindUObject(this, &AABCharacterBase::ComboActionEnd);
+    AnimInstance->Montage_SetEndDelegate(EndDelegate, ComboActionMontage);
+
+    //콤보 시작할떄 타이머 시작
+    ComboTimerHandle.Invalidate();
+    SetComboCheckTimer();
+}
+
+void AABCharacterBase::ComboActionEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
+{
+    //Current Combo는 콤보가 끝날때 절대 0일 수 없음
+    //0이면 에러 메세지
+    ensure(CurrentCombo != 0);
+
+    //CurrentCombo를 0으로 만들기
+    CurrentCombo = 0;
+    //꺼놓고있던 Movement 되돌리기
+    GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
+void AABCharacterBase::SetComboCheckTimer()
+{
+    int32 ComboIndex = CurrentCombo - 1;
+    ensure(ComboActionData->EffectiveFrameCount.IsValidIndex(ComboIndex));
+
+    const float AttackSpeedRate = 1.0f;
+    float ComboEffectiveTime = (ComboActionData->EffectiveFrameCount[ComboIndex] / ComboActionData->FrameRate) / AttackSpeedRate;
+    if (ComboEffectiveTime > 0.0f)
+    {
+        GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &AABCharacterBase::ComboCheck, ComboEffectiveTime, false);
+    }
+}
+
+void AABCharacterBase::ComboCheck()
+{
+    ComboTimerHandle.Invalidate();
+    //만약 입력이 들어와서 HasNextComboCommand가 True라면 다음으로 진행
+    if (HasNextComboCommand)
+    {
+        UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+        //CurrentCombo를 하나 증가시키되, MaxComboCount를 넘지 않도록 클램핑
+        CurrentCombo = FMath::Clamp(CurrentCombo + 1, 1, ComboActionData->MaxComboCount);
+        //다음 섹션으로 이름 변경
+        FName NextSection = *FString::Printf(TEXT("%s%d"), *ComboActionData->MontageSectionNamePrefix, CurrentCombo);
+        //다음 섹션으로 점프
+        AnimInstance->Montage_JumpToSection(NextSection, ComboActionMontage);
+        SetComboCheckTimer();
+        //입력값 초기화
+        HasNextComboCommand = false;
+    }
 }
